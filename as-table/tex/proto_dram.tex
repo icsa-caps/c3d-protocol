@@ -1,0 +1,219 @@
+\mybeginlandscape
+
+\linespread{0.95}
+
+\begin{table*}[t!]
+  \caption{DRAM Cache Controller}
+  \label{dram}
+  \ptabSetupFont
+  \centering
+  \begin{tabular}{
+      |p{0.04\linewidth}
+      |p{0.1\linewidth}
+      |p{0.1\linewidth}
+      |p{0.1\linewidth}
+      |p{0.1\linewidth}
+      |p{0.1\linewidth}
+      |p{0.1\linewidth}
+      |p{0.1\linewidth}
+      |p{0.12\linewidth}
+      |
+    }
+    \hline
+    % Possible Events -------------------------->
+    & Replacement
+    & src?GetS
+    & src?GetX
+    & src?Upgrade
+    & src?Inv
+    & src?Data
+    & src?PutX
+    & src?UpgradeAck
+    % -----------------------
+    \\\hline
+      I
+    &
+      \ptabUnused
+    &
+      dir!GetS;\newline
+      \ptabNextState{IS}
+    &
+      dir!GetX;\newline
+      \ptabNextState{IM}
+    &
+      dir!Upgrade;\newline
+      \ptabNextState{SM\_U}
+    &
+      llc(self)!Inv;
+    &
+      \ptabUnused
+    &
+      // forward\newline
+      dir!PutX;
+    &
+      \ptabUnused
+    % -----------------------
+    \\\hline
+      IS
+    &
+      stall;
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      llc(self)!Inv;\newline
+      \ptabNextState{IS\_I}
+    &
+      copy data;\newline
+      llc(self)!Data;\newline
+      \ptabNextState{S}
+    &
+      // forward\newline
+      dir!PutX;
+    &
+      \ptabUnused
+    % -----------------------
+    \\\hline
+      IS\_I
+    &
+      stall;
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      src!InvAck;
+    &
+      llc(self)!Data;\newline
+      \ptabNextState{I}
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    % -----------------------
+    \\\hline
+      IM
+    &
+      stall;
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      src!InvAck;
+    &
+      copy data;\newline
+      llc(self)!Data;\newline
+      \ptabNextState{M}
+    &
+      // forward\newline
+      dir!PutX;
+    &
+      \ptabUnused
+    % -----------------------
+    \\\hline
+      S
+    &
+      \ptabNextState{I}
+    &
+      src!Data;
+    &
+      %dir!Upgrade;\newline
+      dir!GetX;\newline
+      \ptabNextState{SM}
+    &
+      dir!Upgrade;\newline
+      \ptabNextState{SM\_U}
+    &
+      llc(self)!Inv;\newline
+      \ptabNextState{I}
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    % -----------------------
+    \\\hline
+      SM
+    &
+      stall;
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      llc(self)!Inv;\newline
+      \ptabNextState{IM}
+    &
+      copy data;\newline
+      llc(self)!Data;\newline
+      \ptabNextState{M}
+    &
+      \ptabUnused
+    &
+      %llc(self)!Data\newline
+      %\ptabNextState{M}
+      \ptabUnused
+    % -----------------------
+    \\\hline
+      SM\_U
+    &
+      stall;
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      llc(self)!Inv;\newline
+      \ptabNextState{IM}
+    &
+      copy data;\newline
+      llc(self)!Data;\newline
+      \ptabNextState{M}
+    &
+      \ptabUnused
+    &
+      llc(self)!UpgradeAck;\newline
+      \ptabNextState{M}
+    % -----------------------
+    \\\hline
+      M
+    &
+      \ptabNextState{I}
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      llc(self)!Inv;\newline
+      \ptabNextState{I}
+    &
+      \ptabUnused
+    &
+      copy data;\newline
+      dir!PutX;\newline
+      \ptabNextState{S}
+    &
+      \ptabUnused
+    % END <--------------------------------------
+    \\\hline
+  \end{tabular}
+\end{table*}
+
+\linespread{1}
+
+\myendlandscape

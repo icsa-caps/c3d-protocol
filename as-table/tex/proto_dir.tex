@@ -1,0 +1,346 @@
+\mybeginlandscape
+
+\linespread{0.88}
+
+\begin{table*}[t!]
+  \vspace{-1cm}
+  \caption{Directory Controller}
+  \label{dir}
+  \ptabSetupFont
+  %\centering
+  \hspace{-2.2cm}
+  \begin{tabular}{
+      |p{0.06\linewidth}
+      |p{0.08\linewidth}
+      |p{0.12\linewidth}
+      |p{0.135\linewidth}
+      |p{0.135\linewidth}
+      |p{0.11\linewidth}
+      |p{0.1\linewidth}
+      |p{0.11\linewidth}
+      |p{0.16\linewidth}
+      |
+    }
+    \hline
+    % Possible Events -------------------------->
+    & Replacement
+    & src?GetS
+    & src?GetX
+    & src?Upgrade
+    & src?PutX
+    & src?DataAck
+    & src?DowngradeAck
+    & src?InvAck
+    % -----------------------
+    \\\hline
+      I
+    &
+      \ptabUnused
+    &
+      src!Data;
+    &
+      dst \(\gets\) all -- \{src\};\newline
+      dram(dst)!Inv;\newline
+      b.so \(\gets\) \{src\};\newline
+      tbe.need\_acks \(\gets\) |dst|;\newline
+      \ptabNextState{IM\_IA}
+    &
+      dst \(\gets\) all \(-\) \{src\};\newline
+      dram(dst)!Inv;\newline
+      b.so \(\gets\) \{src\};\newline
+      tbe.need\_acks \(\gets\) |dst|;\newline
+      \ptabNextState{IM\_IA}
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    % -----------------------
+    \\\hline
+      IM\_IA
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      tbe.need\_acks-{}-;\newline
+      \ptabIf{\(\text{tbe.need\_acks} = 0\)}\newline
+      \ptabIndent dram(b.so)!Data;\newline
+      \ptabIndent \ptabNextState{IM\_DA}\newline
+      \ptabEndif
+    % -----------------------
+    \\\hline
+      IM\_DA
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      copy data;\newline
+      llc(src)!PutAck;\newline
+      \ptabNextState{MI}
+    &
+      \ptabNextState{M}
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    % -----------------------
+    \\\hline
+      S
+    &
+      \ptabNextState{I}
+    &
+      b.so \(\gets\) b.so \(\cup\) \{src\};\newline
+      src!Data;
+    &
+      dst \(\gets\) b.so \(-\) \{src\};\newline
+      dram(dst)!Inv;\newline
+      b.so \(\gets\) \{src\};\newline
+      tbe.need\_acks \(\gets\) |dst|;\newline
+      \ptabNextState{SM\_IA}
+    &
+      dst \(\gets\) b.so \(-\) \{src\};\newline
+      dram(dst)!Inv;\newline
+      b.so \(\gets\) \{src\};\newline
+      tbe.need\_acks \(\gets\) |dst|;\newline
+      \ptabIf{\(\text{src} \in \text{dst}\)}\newline
+      \ptabIndent \ptabNextState{SM\_U\_IA}
+      \ptabElse\newline
+      \ptabIndent \ptabNextState{SM\_IA} \quad
+      \ptabEndif
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    % -----------------------
+    \\\hline
+      SM\_IA
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      tbe.need\_acks-{}-;\newline
+      \ptabIf{\(\text{tbe.need\_acks} = 0\)}\newline
+      \ptabIndent dram(b.so)!Data;\newline
+      \ptabIndent \ptabNextState{SM\_DA}\newline
+      \ptabEndif
+    % -----------------------
+    \\\hline
+      SM\_U\_IA
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      tbe.need\_acks-{}-;\newline
+      \ptabIf{\(\text{tbe.need\_acks} = 0\)}\newline
+      \ptabIndent dram(b.so)!UpgradeAck;\newline
+      \ptabIndent \ptabNextState{SM\_DA}\newline
+      \ptabEndif
+    % -----------------------
+    \\\hline
+      SM\_DA
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      copy data;\newline
+      llc(src)!PutAck;\newline
+      \ptabNextState{MI}
+    &
+      \ptabNextState{M}
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    % -----------------------
+    \\\hline
+      M
+    &
+      dram(b.so)!Inv;\newline
+      \ptabNextState{MI}
+    &
+      llc(b.so)!Downgrade;\newline
+      b.so \(\gets\) b.so \(\cup\) src;\newline
+      tbe.req \(\gets\) src;\newline
+      \ptabNextState{MS2}
+    &
+      dram(b.so)!Inv;\newline
+      b.so \(\gets\) \{src\};\newline
+      \ptabNextState{MM\_P}
+    &
+      dram(b.so)!Inv;\newline
+      b.so \(\gets\) \{src\};\newline
+      \ptabNextState{MM\_P}
+    &
+      copy data;\newline
+      llc(src)!PutAck;\newline
+      \ptabNextState{I}
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    % -----------------------
+    \\\hline
+      MM\_P
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      // forward\newline
+      dram(b.so)!Data;\newline
+      \ptabNextState{MM\_DA}
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    % -----------------------
+    \\\hline
+      MM\_DA
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      copy data;\newline
+      llc(src)!PutAck;\newline
+      \ptabNextState{MI}
+    &
+      \ptabNextState{M}
+    &
+      \ptabUnused
+    &
+      \ptabUnused
+    % -----------------------
+    \\\hline
+      MS2
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      copy data;\newline
+      \ptabNextState{MS1}
+    &
+      \ptabUnused
+    &
+      \ptabNextState{MS1}
+    &
+      \ptabUnused
+    % -----------------------
+    \\\hline
+      MS1
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      copy data;\newline
+      dram(tbe.req)!Data;\newline
+      llc(src)!PutAck;\newline
+      \ptabNextState{S}
+    &
+      \ptabUnused
+    &
+      dram(tbe.req)!Data;\newline
+      llc(src)!PutAck;\newline
+      \ptabNextState{S}
+    &
+      \ptabUnused
+    % -----------------------
+    \\\hline
+      MI
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      stall;
+    &
+      copy data;\newline
+      \ptabNextState{I}
+    &
+      \ptabNextState{I}
+    &
+      \ptabUnused
+    &
+      \ptabNextState{I}
+    % END <--------------------------------------
+    \\\hline
+  \end{tabular}
+\end{table*}
+
+\linespread{1}
+
+\myendlandscape

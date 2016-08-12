@@ -1,0 +1,93 @@
+%
+% Protocol description template
+%
+
+\documentclass[
+  11pt,
+  a4paper
+  ]{scrartcl}
+
+%% Packages -------------------------------------
+
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{lmodern}
+\usepackage{calc}
+\usepackage{array}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[table]{xcolor}
+\usepackage{authblk}
+\usepackage{scrpage2}
+\pagestyle{scrheadings}
+
+\bibliographystyle{alpha}
+\newcommand{\printbibliography}{
+  \bibliography{micro2016}
+}
+
+%% Commands -------------------------------------
+
+\newcommand{\mybeginlandscape}{
+  \clearpage
+  \KOMAoptions{pagesize,paper=landscape,DIV=14}
+}
+
+\newcommand{\myendlandscape}{
+  \clearpage
+  \KOMAoptions{pagesize,paper=portrait,DIV=11}
+}
+
+\newcommand{\mybeginlandscapeL}{
+  \clearpage
+  \KOMAoptions{paper=A3,pagesize,paper=landscape,DIV=19}
+}
+
+\newcommand{\myendlandscapeL}{
+  \clearpage
+  \KOMAoptions{paper=A4,pagesize,paper=portrait,DIV=11}
+}
+
+% Protocol Table commands
+\newcommand{\ptabUnused}{\cellcolor[gray]{0.8}}
+\newcommand{\ptabIndent}{\mbox{\quad}}
+\newcommand{\ptabWrapSymbol}{\reflectbox{\rotatebox[origin=c]{180}{\color{gray}\hspace{-3.5pt}\(\Rsh\)}}}
+\newcommand{\ptabWrapI}{\newline\ptabWrapSymbol\ptabIndent\ }
+\newcommand{\ptabWrap}{\newline\ptabWrapSymbol\ }
+\newcommand{\ptabSetupFont}{\footnotesize\sf}
+\newcommand{\ptabIf}[1]{\textbf{if} #1 \textbf{then}}
+\newcommand{\ptabEndif}{\textbf{endif}}
+\newcommand{\ptabElse}{\textbf{else}}
+\newcommand{\ptabElif}[1]{\textbf{elif} #1 \textbf{then}}
+\newcommand{\ptabNextState}[1]{\(\rightarrow\) #1}
+
+%% Content --------------------------------------
+
+\ihead{C3D Protocol Specification}
+\ohead{\today}
+
+\title{C3D: Mitigating the NUMA Bottleneck via Coherent DRAM Caches
+  \\[1ex]\Large{Detailed Protocol Specification}}
+\author[1]{Cheng-Chieh Huang}
+\author[1]{Rakesh Kumar}
+\author[1]{Marco Elver}
+\author[1]{Boris Grot}
+\author[1]{Vijay Nagarajan}
+\affil[1]{University of Edinburgh}
+
+\renewcommand\Authands{ and }
+
+\begin{document}
+\maketitle
+
+\input{./tex/intro.tex}
+\input{./tex/controllers.tex}
+\input{./tex/proto_llc.tex}
+\input{./tex/proto_dram.tex}
+\input{./tex/proto_dir.tex}
+
+\printbibliography
+
+\end{document}

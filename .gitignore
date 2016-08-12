@@ -1,0 +1,16 @@
+*.cpp
+*.swp
+C3D
+*.log
+*.aux
+*.out
+*.bbl
+*.blg
+*.toc
+*.lof
+*.lol
+*.lot
+*.bcf
+*.run.xml
+*.nav
+*.snm

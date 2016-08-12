@@ -1,0 +1,26 @@
+\section{Controllers}
+
+The following summarizes the notation and assumptions used in the transition
+tables:
+\begin{itemize}
+  \item Format of receive message action: \textsf{source?Message}
+  \item Format of send message action: \textsf{destination!Message}
+  \item Only the message types \textsf{Data} and \textsf{PutX} carry data.
+  \item No ordering constraints on interconnect.
+  \item The sharer list or owner entry per line \textsf{b.so} points to
+    sockets. The functions \textsf{llc(socket)} and \textsf{dram(socket}) are
+    used to refer to the LLC or DRAM cache controller within the socket
+    respectively; \textsf{self} refers to the controller's socket.
+\end{itemize}
+
+\subsection{LLC Controller}
+
+Table~\ref{llc} shows the last level on-chip cache controller.
+
+\subsection{DRAM Cache Controller}
+
+Table~\ref{dram} shows the DRAM cache controller.
+
+\subsection{Directory Controller}
+
+Table~\ref{dir} shows the main memory directory controller.
